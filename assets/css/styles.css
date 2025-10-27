@@ -1,0 +1,70 @@
+/* Estilos base replicando o design fornecido */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+* { box-sizing: border-box; }
+body, html { height: 100%; margin: 0; font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif; }
+
+.ion-header { background: transparent; }
+.ion-toolbar {
+  --background: #c4680b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  color: white;
+  font-size: 24px;
+}
+.ion-title { color: white; font-weight: 700; }
+
+.background-content { --background: #f6d0a7; height: calc(100% - 56px); }
+
+#container {
+  background-image: url('/assets/img/plano-de-fundo-cadastro-aluno\ copy.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.balao-principal {
+  background-color: #f0c79f;
+  border-radius: 20px;
+  width: 320px;
+  padding: 25px 30px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+.balao-principal h1 { font-size: 28px; margin-bottom: 25px; font-weight: bold; color: #3c2500; }
+
+.balao-topo { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+
+.botao-Aluno, .botao-Professor {
+  flex: 1; max-width: 120px; background: #f4cba1; padding: 6px 0; border-radius: 8px; border: 1px solid black;
+  font-weight: bold; color: #4d4035; cursor: pointer; font-size: 16px; text-align: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.4);
+}
+.botao-Aluno:hover, .botao-Professor:hover { background: #eabf90; }
+
+.balao-interno form { display:flex; flex-direction:column; gap:12px; margin-bottom:15px; }
+.balao-interno input {
+  padding: 10px 15px; border-radius: 25px; border: 1px solid #c99a62; background-color: #ffffff;
+  font-size: 14px; color: #4b3a00; outline: none; position: relative;
+}
+
+.btn-submit {
+  margin-top: 10px; background-color: #c4680b; color: #fff; font-weight: 700; border: none; border-radius: 12px;
+  padding: 12px 0; font-size: 20px; cursor: pointer; transition: background-color 0.3s ease;
+}
+.btn-submit:hover { background-color: #a35207; }
+
+.forgot-text { margin-top: 8px; font-size: 14px; color: #6b3f00; cursor: pointer; user-select: none; }
+
+/* Responsivo */
+@media (max-width: 420px) { .balao-principal { width: 92%; padding: 20px; } }

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro do Docente</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="ion-header" role="banner">
+    <div class="ion-toolbar">
+      <div class="ion-title"></div>
+    </div>
+  </header>
+
+  <main class="ion-content background-content">
+    <div id="container">
+      <div class="balao-principal">
+        <h1>Cadastro do Docente</h1>
+
+        <div class="balao-topo">
+          <button type="button" class="botao-Aluno" onclick="location.href='alunos.html'">Aluno</button>
+          <button type="button" class="botao-Professor" disabled>Docente</button>
+        </div>
+
+        <div class="balao-interno">
+          <form id="form-docente" action="#" method="post">
+            <input type="text" placeholder="Nome" name="nome" required />
+            <input type="text" placeholder="Identificador" name="identificador" required />
+            <input type="password" placeholder="Senha" name="senha" required />
+
+            <button type="submit" class="btn-submit">Cadastrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const baseUrl = 'http://localhost:3000';
+    const formDocente = document.getElementById('form-docente');
+    const btnDoc = formDocente.querySelector('.btn-submit');
+
+    function setLoading(btn, loading) {
+      if (loading) {
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar';
+      }
+    }
+
+    formDocente.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        nome: form.nome.value.trim(),
+        identificador: form.identificador.value.trim(),
+        senha: form.senha.value
+      };
+
+      setLoading(btnDoc, true);
+      try {
+        const res = await fetch(baseUrl + '/register/docente', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (!res.ok) throw json;
+        alert(json.message || 'Docente cadastrado com sucesso');
+        form.reset();
+      } catch (err) {
+        console.error('Erro ao cadastrar docente:', err);
+        alert((err && err.message) || 'Erro ao cadastrar docente');
+      } finally {
+        setLoading(btnDoc, false);
+      }
+    });
+  </script>
+</body>
+</html>
