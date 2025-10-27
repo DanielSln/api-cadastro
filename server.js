@@ -1,4 +1,4 @@
-// require('dotenv').config();server.js
+// require('dotenv').config();
 
 const express = require('express');
 const mysql = require('mysql2/promise');
@@ -82,6 +82,7 @@ function onlyDigits(str = '') {
   return (str || '').toString().replace(/\D+/g, '');
 }
 
+// Rotas
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'alunos.html'));
 });
@@ -96,19 +97,12 @@ app.post('/register/aluno', async (req, res) => {
 
   const conn = await pool.getConnection();
   try {
-    const [existing] = await conn.query('SELECT id, nome, cpf, matricula FROM alunos WHERE matricula = ? OR cpf = ? LIMIT 1', [matriculaStr, cpfClean]);
+    const [existing] = await conn.query('SELECT id FROM alunos WHERE matricula = ? OR cpf = ? LIMIT 1', [matriculaStr, cpfClean]);
     if (existing.length > 0) {
-      return res.status(409).json({
-        message: 'Aluno já cadastrado (CPF ou matrícula já existente)',
-        existing: existing[0]
-      });
+      return res.status(409).json({ message: 'Aluno já cadastrado', existing: existing[0] });
     }
     const [result] = await conn.query('INSERT INTO alunos (nome, cpf, matricula) VALUES (?, ?, ?)', [nome, cpfClean, matriculaStr]);
     return res.status(201).json({ message: 'Aluno cadastrado', id: result.insertId });
-  } catch (err) {
-    if (err.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'Aluno já cadastrado (duplicate)', error: err.message });
-    console.error(err);
-    return res.status(500).json({ message: 'Erro ao cadastrar aluno', error: err.message });
   } finally {
     conn.release();
   }
@@ -124,10 +118,6 @@ app.post('/register/docente', async (req, res) => {
   try {
     const [result] = await conn.query('INSERT INTO docentes (nome, identificador, senha) VALUES (?, ?, ?)', [nome, identificador, hashed]);
     return res.status(201).json({ message: 'Docente cadastrado', id: result.insertId });
-  } catch (err) {
-    if (err.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'Identificador já existe', error: err.message });
-    console.error(err);
-    return res.status(500).json({ message: 'Erro ao cadastrar docente', error: err.message });
   } finally {
     conn.release();
   }
@@ -140,18 +130,16 @@ app.post('/login/aluno', async (req, res) => {
 
   const matriculaStr = String(matricula).trim();
   const cpfClean = onlyDigits(cpf);
+
   const conn = await pool.getConnection();
   try {
     const [rows] = await conn.query('SELECT * FROM alunos WHERE matricula = ? AND cpf = ?', [matriculaStr, cpfClean]);
     if (rows.length > 0) {
       const aluno = rows[0];
       const token = jwt.sign({ id: aluno.id, type: 'aluno', matricula: aluno.matricula }, JWT_SECRET, { expiresIn: '8h' });
-      return res.json({ success: true, message: 'Login realizado com sucesso', token, user: { id: aluno.id, nome: aluno.nome, matricula: aluno.matricula, cpf: aluno.cpf } });
+      return res.json({ success: true, message: 'Login realizado', token, user: { id: aluno.id, nome: aluno.nome, matricula: aluno.matricula, cpf: aluno.cpf } });
     }
     return res.status(401).json({ success: false, message: 'Matrícula ou CPF inválidos' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro no servidor', error: err.message });
   } finally {
     conn.release();
   }
@@ -160,6 +148,7 @@ app.post('/login/aluno', async (req, res) => {
 // Login docente
 app.post('/login/docente', async (req, res) => {
   const { identificador, senha } = req.body || {};
+
   if (!identificador || !senha) return res.status(400).json({ success: false, message: 'Identificador e senha são obrigatórios' });
 
   const conn = await pool.getConnection();
@@ -172,22 +161,19 @@ app.post('/login/docente', async (req, res) => {
     if (!senhaValida) return res.status(401).json({ success: false, message: 'Identificador ou senha inválidos' });
 
     const token = jwt.sign({ id: docente.id, identificador: docente.identificador, type: 'docente' }, JWT_SECRET, { expiresIn: '8h' });
-    return res.json({ success: true, message: 'Login realizado com sucesso', token, user: { id: docente.id, nome: docente.nome, identificador: docente.identificador } });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro no servidor', error: err.message });
+    return res.json({ success: true, message: 'Login realizado', token, user: { id: docente.id, nome: docente.nome, identificador: docente.identificador } });
   } finally {
     conn.release();
   }
 });
 
-// Eventos - listar
+// Eventos
 app.get('/api/events', async (req, res) => {
   const year = parseInt(req.query.year, 10);
   const month = parseInt(req.query.month, 10);
   const teacherId = req.query.teacher_id || null;
 
-  if (!year || !month || month < 1 || month > 12) return res.status(400).json({ success: false, message: 'Parâmetros year e month (1-12) são obrigatórios' });
+  if (!year || !month || month < 1 || month > 12) return res.status(400).json({ success: false, message: 'Parâmetros year e month são obrigatórios' });
 
   const first = `${year}-${String(month).padStart(2, '0')}-01`;
   const lastDate = new Date(year, month, 0).getDate();
@@ -204,15 +190,11 @@ app.get('/api/events', async (req, res) => {
   try {
     const [results] = await conn.query(sql, params);
     return res.json({ success: true, events: results });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro no servidor', error: err.message });
   } finally {
     conn.release();
   }
 });
 
-// Criar evento
 app.post('/api/events', authenticateJWT, async (req, res) => {
   const teacherId = req.user && req.user.id ? req.user.id : null;
   const { date, title, color } = req.body || {};
@@ -222,54 +204,6 @@ app.post('/api/events', authenticateJWT, async (req, res) => {
   try {
     const [result] = await conn.query('INSERT INTO calendario_events (teacher_id, date, title, color) VALUES (?, ?, ?, ?)', [teacherId, date, title, color]);
     return res.status(201).json({ success: true, message: 'Evento criado', id: result.insertId });
-  } catch (err) {
-    if (err.code === 'ER_DUP_ENTRY') {
-      try {
-        const [updated] = await conn.query('UPDATE calendario_events SET title = ?, color = ?, teacher_id = ? WHERE date = ?', [title, color, teacherId, date]);
-        return res.json({ success: true, message: 'Evento atualizado (duplicado)', affectedRows: updated.affectedRows || 0 });
-      } catch (err2) {
-        console.error(err2);
-        return res.status(500).json({ success: false, message: 'Erro interno', error: err2.message });
-      }
-    }
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro ao inserir evento', error: err.message });
-  } finally {
-    conn.release();
-  }
-});
-
-// Atualizar evento
-app.put('/api/events/:id', authenticateJWT, async (req, res) => {
-  const teacherId = req.user && req.user.id ? req.user.id : null;
-  const id = parseInt(req.params.id, 10);
-  const { date, title, color } = req.body || {};
-  if (!id || !date || !title || !color) return res.status(400).json({ success: false, message: 'id, date, title e color são obrigatórios' });
-
-  const conn = await pool.getConnection();
-  try {
-    const [result] = await conn.query('UPDATE calendario_events SET date = ?, title = ?, color = ?, teacher_id = ? WHERE id = ?', [date, title, color, teacherId, id]);
-    return res.json({ success: true, message: 'Evento atualizado', affectedRows: result.affectedRows });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro ao atualizar evento', error: err.message });
-  } finally {
-    conn.release();
-  }
-});
-
-// Deletar evento
-app.delete('/api/events/:id', authenticateJWT, async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!id) return res.status(400).json({ success: false, message: 'ID inválido' });
-
-  const conn = await pool.getConnection();
-  try {
-    const [result] = await conn.query('DELETE FROM calendario_events WHERE id = ?', [id]);
-    return res.json({ success: true, message: 'Evento removido', affectedRows: result.affectedRows });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Erro ao deletar', error: err.message });
   } finally {
     conn.release();
   }
@@ -277,21 +211,18 @@ app.delete('/api/events/:id', authenticateJWT, async (req, res) => {
 
 app.use(express.static(path.join(__dirname)));
 
-const PORT = process.env.PORT || 3000;
+// Inicialização do banco de dados sem listen
 (async () => {
   try {
-    // Test DB connection and create tables
     const conn = await pool.getConnection();
     await conn.ping();
     conn.release();
     console.log('Conectado ao MySQL (pool)');
     await ensureTables();
-
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
   } catch (err) {
-    console.error('Falha ao iniciar servidor - erro de banco de dados:', err.message);
+    console.error('Falha ao iniciar banco de dados:', err.message);
     process.exit(1);
   }
 })();
+
+module.exports = app; // exporta para o Vercel
