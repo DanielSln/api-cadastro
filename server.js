@@ -1,4 +1,5 @@
-// require('dotenv').config();
+require('dotenv').config();
+
 
 const express = require('express');
 const mysql = require('mysql2/promise');
@@ -11,17 +12,19 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*' }));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'troque_esta_chave_em_producao';
+const JWT_SECRET = process.env.JWT_SECRET || 'pokecreche_secret';
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'q1w2e3',
-  database: process.env.DB_NAME || 'PokeCreche',
+  host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
+  user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || 'q1w2e3',
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'pokecreche',
+  port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
-  connectionLimit: parseInt(process.env.DB_CONN_LIMIT, 10) || 10,
+  connectionLimit: 10,
   timezone: '+00:00'
 });
+
 
 // Função para criar tabelas se não existirem
 async function ensureTables() {
