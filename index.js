@@ -1,5 +1,4 @@
 require('dotenv').config();
-import serverless from 'serverless-http';
 
 console.log('Iniciando API PokeCreche...');
 
@@ -230,5 +229,4 @@ app.use(express.static(path.join(__dirname)));
   }
 })();
 
-export default serverless(app);
 module.exports = app; // exporta para o Vercel
