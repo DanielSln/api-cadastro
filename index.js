@@ -325,7 +325,6 @@ app.post("/api/events", authenticateJWT, async (req, res) => {
 
 app.use(express.static(path.join(__dirname)));
 
-// Inicialização do banco de dados sem listen
 (async () => {
   try {
     const conn = await pool.getConnection();
@@ -335,7 +334,7 @@ app.use(express.static(path.join(__dirname)));
     await ensureTables();
   } catch (err) {
     console.error("Falha ao iniciar banco de dados:", err.message);
-    process.exit(1);
+    // Não encerra o processo, apenas loga o erro
   }
 })();
 
