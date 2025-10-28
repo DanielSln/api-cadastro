@@ -103,6 +103,8 @@ function onlyDigits(str = "") {
   return (str || "").toString().replace(/\D+/g, "");
 }
 
+// Rotas
+
 // Registro aluno
 app.post("/register/aluno", async (req, res) => {
   const { nome, cpf, matricula } = req.body || {};
