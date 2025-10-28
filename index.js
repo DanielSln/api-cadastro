@@ -338,4 +338,4 @@ app.use(express.static(path.join(__dirname)));
   }
 })();
 
-module.exports = app; // exporta para o Vercel
+export default app; // exporta para o Vercel
