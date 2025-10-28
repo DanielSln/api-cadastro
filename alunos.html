@@ -1,83 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cadastro do Aluno</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
-</head>
-<body>
-  <header class="ion-header" role="banner">
-    <div class="ion-toolbar">
-      <div class="ion-title"></div>
-    </div>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadastro do Aluno</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="ion-header" role="banner">
+      <div class="ion-toolbar">
+        <div class="ion-title"></div>
+      </div>
+    </header>
 
-  <main class="ion-content background-content">
-    <div id="container">
-      <div class="balao-principal">
-        <h1>Cadastro do Aluno</h1>
+    <main class="ion-content background-content">
+      <div id="container">
+        <div class="balao-principal">
+          <h1>Cadastro do Aluno</h1>
 
-        <div class="balao-topo">
-          <button type="button" class="botao-Aluno" disabled>Aluno</button>
-          <button type="button" class="botao-Professor" onclick="location.href='docentes.html'">Docente</button>
-        </div>
+          <div class="balao-topo">
+            <button type="button" class="botao-Aluno" disabled>Aluno</button>
+            <button
+              type="button"
+              class="botao-Professor"
+              onclick="location.href='docentes.html'"
+            >
+              Docente
+            </button>
+          </div>
 
-        <div class="balao-interno">
-          <form id="form-aluno" action="#" method="post">
-            <input type="text" placeholder="Nome" name="nome" required />
-            <input type="text" placeholder="CPF" name="cpf" required />
-            <input type="text" placeholder="Nº Matrícula" name="matricula" required />
+          <div class="balao-interno">
+            <form id="form-aluno" action="#" method="post">
+              <input type="text" placeholder="Nome" name="nome" required />
+              <input type="text" placeholder="CPF" name="cpf" required />
+              <input
+                type="text"
+                placeholder="Nº Matrícula"
+                name="matricula"
+                required
+              />
 
-            <button type="submit" class="btn-submit">Cadastrar</button>
-          </form>
+              <button type="submit" class="btn-submit">Cadastrar</button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <script>
-    const baseUrl = 'http://localhost:3000';
-    const formAluno = document.getElementById('form-aluno');
-    const btnAluno = formAluno.querySelector('.btn-submit');
+    <script>
+      const baseUrl = "https://api-cadastro-cm7kfdw2w-daniels-projects-0ae5f489.vercel.app";
+      ``
+      const formAluno = document.getElementById("form-aluno");
+      const btnAluno = formAluno.querySelector(".btn-submit");
 
-    function setLoading(btn, loading) {
-      if (loading) {
-        btn.disabled = true;
-        btn.textContent = 'Enviando...';
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
+      function setLoading(btn, loading) {
+        if (loading) {
+          btn.disabled = true;
+          btn.textContent = "Enviando...";
+        } else {
+          btn.disabled = false;
+          btn.textContent = "Cadastrar";
+        }
       }
-    }
 
-    formAluno.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = {
-        nome: form.nome.value.trim(),
-        cpf: form.cpf.value.trim(),
-        matricula: form.matricula.value.trim()
-      };
+      formAluno.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+          nome: form.nome.value.trim(),
+          cpf: form.cpf.value.trim(),
+          matricula: form.matricula.value.trim(),
+        };
 
-      setLoading(btnAluno, true);
-      try {
-        const res = await fetch(baseUrl + '/register/aluno', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const json = await res.json();
-        if (!res.ok) throw json;
-        alert(json.message || 'Aluno cadastrado com sucesso');
-        form.reset();
-      } catch (err) {
-        console.error('Erro ao cadastrar aluno:', err);
-        alert((err && err.message) || 'Erro ao cadastrar aluno');
-      } finally {
-        setLoading(btnAluno, false);
-      }
-    });
-  </script>
-</body>
+        setLoading(btnAluno, true);
+        try {
+          const res = await fetch(baseUrl + "/register/aluno", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          const json = await res.json();
+          if (!res.ok) throw json;
+          alert(json.message || "Aluno cadastrado com sucesso");
+          form.reset();
+        } catch (err) {
+          console.error("Erro ao cadastrar aluno:", err);
+          alert((err && err.message) || "Erro ao cadastrar aluno");
+        } finally {
+          setLoading(btnAluno, false);
+        }
+      });
+    </script>
+  </body>
 </html>
