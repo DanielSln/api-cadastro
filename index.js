@@ -26,6 +26,12 @@ app.get("/docentes.html", (req, res) => {
   res.sendFile(path.join(__dirname, "docentes.html"));
 });
 
+// ✅ Servir favicon
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "assets", "img", "favicon.ico"));
+});
+
+
 // ✅ Depois disso vêm suas rotas de API (register, login, etc.)
 
 const JWT_SECRET = process.env.JWT_SECRET || "pokecreche_secret";
