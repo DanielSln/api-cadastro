@@ -1,31 +1,45 @@
-require('dotenv').config();
+require("dotenv").config();
+console.log("Iniciando API PokeCreche...");
 
-console.log('Iniciando API PokeCreche...');
-
-const express = require('express');
-const mysql = require('mysql2/promise');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const path = require('path');
+const express = require("express");
+const mysql = require("mysql2/promise");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const app = express();
-app.use(express.json());
-app.use(cors({ origin: '*' }));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'pokecreche_secret';
+// Middlewares
+app.use(express.json());
+app.use(cors({ origin: "*" }));
+
+// ✅ Servir arquivos estáticos (CSS, imagens, etc.)
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
+// ✅ Rotas para HTML
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "alunos.html"));
+});
+
+app.get("/docentes.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "docentes.html"));
+});
+
+// ✅ Depois disso vêm suas rotas de API (register, login, etc.)
+
+const JWT_SECRET = process.env.JWT_SECRET || "pokecreche_secret";
 
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-  user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || 'q1w2e3',
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'pokecreche',
+  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "q1w2e3",
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "pokecreche",
   port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
-  timezone: '+00:00'
+  timezone: "+00:00",
 });
-
 
 // Função para criar tabelas se não existirem
 async function ensureTables() {
@@ -62,7 +76,7 @@ async function ensureTables() {
     await conn.query(createAlunos);
     await conn.query(createDocentes);
     await conn.query(createEvents);
-    console.log('Tabelas verificadas/criadas');
+    console.log("Tabelas verificadas/criadas");
   } finally {
     conn.release();
   }
@@ -71,122 +85,199 @@ async function ensureTables() {
 // Middleware JWT
 function authenticateJWT(req, res, next) {
   const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, message: 'Token ausente' });
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Token ausente" });
   }
-  const token = auth.split(' ')[1];
+  const token = auth.split(" ")[1];
   jwt.verify(token, JWT_SECRET, (err, payload) => {
-    if (err) return res.status(401).json({ success: false, message: 'Token inválido' });
+    if (err)
+      return res
+        .status(401)
+        .json({ success: false, message: "Token inválido" });
     req.user = payload;
     next();
   });
 }
 
-function onlyDigits(str = '') {
-  return (str || '').toString().replace(/\D+/g, '');
+function onlyDigits(str = "") {
+  return (str || "").toString().replace(/\D+/g, "");
 }
 
-// Rotas
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'alunos.html'));
-});
-
 // Registro aluno
-app.post('/register/aluno', async (req, res) => {
+app.post("/register/aluno", async (req, res) => {
   const { nome, cpf, matricula } = req.body || {};
-  if (!nome || !cpf || !matricula) return res.status(400).json({ message: 'Campos nome, cpf e matricula são obrigatórios' });
+  if (!nome || !cpf || !matricula)
+    return res
+      .status(400)
+      .json({ message: "Campos nome, cpf e matricula são obrigatórios" });
 
   const cpfClean = onlyDigits(cpf);
   const matriculaStr = String(matricula).trim();
 
   const conn = await pool.getConnection();
   try {
-    const [existing] = await conn.query('SELECT id FROM alunos WHERE matricula = ? OR cpf = ? LIMIT 1', [matriculaStr, cpfClean]);
+    const [existing] = await conn.query(
+      "SELECT id FROM alunos WHERE matricula = ? OR cpf = ? LIMIT 1",
+      [matriculaStr, cpfClean]
+    );
     if (existing.length > 0) {
-      return res.status(409).json({ message: 'Aluno já cadastrado', existing: existing[0] });
+      return res
+        .status(409)
+        .json({ message: "Aluno já cadastrado", existing: existing[0] });
     }
-    const [result] = await conn.query('INSERT INTO alunos (nome, cpf, matricula) VALUES (?, ?, ?)', [nome, cpfClean, matriculaStr]);
-    return res.status(201).json({ message: 'Aluno cadastrado', id: result.insertId });
+    const [result] = await conn.query(
+      "INSERT INTO alunos (nome, cpf, matricula) VALUES (?, ?, ?)",
+      [nome, cpfClean, matriculaStr]
+    );
+    return res
+      .status(201)
+      .json({ message: "Aluno cadastrado", id: result.insertId });
   } finally {
     conn.release();
   }
 });
 
 // Registro docente
-app.post('/register/docente', async (req, res) => {
+app.post("/register/docente", async (req, res) => {
   const { nome, identificador, senha } = req.body || {};
-  if (!nome || !identificador || !senha) return res.status(400).json({ message: 'Campos nome, identificador e senha são obrigatórios' });
+  if (!nome || !identificador || !senha)
+    return res
+      .status(400)
+      .json({ message: "Campos nome, identificador e senha são obrigatórios" });
 
   const hashed = await bcrypt.hash(senha, 10);
   const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query('INSERT INTO docentes (nome, identificador, senha) VALUES (?, ?, ?)', [nome, identificador, hashed]);
-    return res.status(201).json({ message: 'Docente cadastrado', id: result.insertId });
+    const [result] = await conn.query(
+      "INSERT INTO docentes (nome, identificador, senha) VALUES (?, ?, ?)",
+      [nome, identificador, hashed]
+    );
+    return res
+      .status(201)
+      .json({ message: "Docente cadastrado", id: result.insertId });
   } finally {
     conn.release();
   }
 });
 
 // Login aluno
-app.post('/login/aluno', async (req, res) => {
+app.post("/login/aluno", async (req, res) => {
   const { matricula, cpf } = req.body || {};
-  if (!matricula || !cpf) return res.status(400).json({ success: false, message: 'Matrícula e CPF são obrigatórios' });
+  if (!matricula || !cpf)
+    return res
+      .status(400)
+      .json({ success: false, message: "Matrícula e CPF são obrigatórios" });
 
   const matriculaStr = String(matricula).trim();
   const cpfClean = onlyDigits(cpf);
 
   const conn = await pool.getConnection();
   try {
-    const [rows] = await conn.query('SELECT * FROM alunos WHERE matricula = ? AND cpf = ?', [matriculaStr, cpfClean]);
+    const [rows] = await conn.query(
+      "SELECT * FROM alunos WHERE matricula = ? AND cpf = ?",
+      [matriculaStr, cpfClean]
+    );
     if (rows.length > 0) {
       const aluno = rows[0];
-      const token = jwt.sign({ id: aluno.id, type: 'aluno', matricula: aluno.matricula }, JWT_SECRET, { expiresIn: '8h' });
-      return res.json({ success: true, message: 'Login realizado', token, user: { id: aluno.id, nome: aluno.nome, matricula: aluno.matricula, cpf: aluno.cpf } });
+      const token = jwt.sign(
+        { id: aluno.id, type: "aluno", matricula: aluno.matricula },
+        JWT_SECRET,
+        { expiresIn: "8h" }
+      );
+      return res.json({
+        success: true,
+        message: "Login realizado",
+        token,
+        user: {
+          id: aluno.id,
+          nome: aluno.nome,
+          matricula: aluno.matricula,
+          cpf: aluno.cpf,
+        },
+      });
     }
-    return res.status(401).json({ success: false, message: 'Matrícula ou CPF inválidos' });
+    return res
+      .status(401)
+      .json({ success: false, message: "Matrícula ou CPF inválidos" });
   } finally {
     conn.release();
   }
 });
 
 // Login docente
-app.post('/login/docente', async (req, res) => {
+app.post("/login/docente", async (req, res) => {
   const { identificador, senha } = req.body || {};
 
-  if (!identificador || !senha) return res.status(400).json({ success: false, message: 'Identificador e senha são obrigatórios' });
+  if (!identificador || !senha)
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Identificador e senha são obrigatórios",
+      });
 
   const conn = await pool.getConnection();
   try {
-    const [rows] = await conn.query('SELECT * FROM docentes WHERE identificador = ?', [identificador]);
-    if (rows.length === 0) return res.status(401).json({ success: false, message: 'Identificador ou senha inválidos' });
+    const [rows] = await conn.query(
+      "SELECT * FROM docentes WHERE identificador = ?",
+      [identificador]
+    );
+    if (rows.length === 0)
+      return res
+        .status(401)
+        .json({ success: false, message: "Identificador ou senha inválidos" });
 
     const docente = rows[0];
     const senhaValida = await bcrypt.compare(senha, docente.senha);
-    if (!senhaValida) return res.status(401).json({ success: false, message: 'Identificador ou senha inválidos' });
+    if (!senhaValida)
+      return res
+        .status(401)
+        .json({ success: false, message: "Identificador ou senha inválidos" });
 
-    const token = jwt.sign({ id: docente.id, identificador: docente.identificador, type: 'docente' }, JWT_SECRET, { expiresIn: '8h' });
-    return res.json({ success: true, message: 'Login realizado', token, user: { id: docente.id, nome: docente.nome, identificador: docente.identificador } });
+    const token = jwt.sign(
+      { id: docente.id, identificador: docente.identificador, type: "docente" },
+      JWT_SECRET,
+      { expiresIn: "8h" }
+    );
+    return res.json({
+      success: true,
+      message: "Login realizado",
+      token,
+      user: {
+        id: docente.id,
+        nome: docente.nome,
+        identificador: docente.identificador,
+      },
+    });
   } finally {
     conn.release();
   }
 });
 
 // Eventos
-app.get('/api/events', async (req, res) => {
+app.get("/api/events", async (req, res) => {
   const year = parseInt(req.query.year, 10);
   const month = parseInt(req.query.month, 10);
   const teacherId = req.query.teacher_id || null;
 
-  if (!year || !month || month < 1 || month > 12) return res.status(400).json({ success: false, message: 'Parâmetros year e month são obrigatórios' });
+  if (!year || !month || month < 1 || month > 12)
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Parâmetros year e month são obrigatórios",
+      });
 
-  const first = `${year}-${String(month).padStart(2, '0')}-01`;
+  const first = `${year}-${String(month).padStart(2, "0")}-01`;
   const lastDate = new Date(year, month, 0).getDate();
-  const last = `${year}-${String(month).padStart(2, '0')}-${String(lastDate).padStart(2, '0')}`;
+  const last = `${year}-${String(month).padStart(2, "0")}-${String(
+    lastDate
+  ).padStart(2, "0")}`;
 
   let sql = `SELECT id, teacher_id, DATE_FORMAT(date, '%Y-%m-%d') AS date, title, color FROM calendario_events WHERE date BETWEEN ? AND ?`;
   const params = [first, last];
   if (teacherId) {
-    sql += ' AND teacher_id = ?';
+    sql += " AND teacher_id = ?";
     params.push(teacherId);
   }
 
@@ -199,15 +290,26 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
-app.post('/api/events', authenticateJWT, async (req, res) => {
+app.post("/api/events", authenticateJWT, async (req, res) => {
   const teacherId = req.user && req.user.id ? req.user.id : null;
   const { date, title, color } = req.body || {};
-  if (!date || !title || !color) return res.status(400).json({ success: false, message: 'date, title e color são obrigatórios' });
+  if (!date || !title || !color)
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "date, title e color são obrigatórios",
+      });
 
   const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query('INSERT INTO calendario_events (teacher_id, date, title, color) VALUES (?, ?, ?, ?)', [teacherId, date, title, color]);
-    return res.status(201).json({ success: true, message: 'Evento criado', id: result.insertId });
+    const [result] = await conn.query(
+      "INSERT INTO calendario_events (teacher_id, date, title, color) VALUES (?, ?, ?, ?)",
+      [teacherId, date, title, color]
+    );
+    return res
+      .status(201)
+      .json({ success: true, message: "Evento criado", id: result.insertId });
   } finally {
     conn.release();
   }
@@ -221,10 +323,10 @@ app.use(express.static(path.join(__dirname)));
     const conn = await pool.getConnection();
     await conn.ping();
     conn.release();
-    console.log('Conectado ao MySQL (pool)');
+    console.log("Conectado ao MySQL (pool)");
     await ensureTables();
   } catch (err) {
-    console.error('Falha ao iniciar banco de dados:', err.message);
+    console.error("Falha ao iniciar banco de dados:", err.message);
     process.exit(1);
   }
 })();
