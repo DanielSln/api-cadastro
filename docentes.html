@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -37,18 +38,13 @@
   </main>
 
   <script>
-    const baseUrl = 'http://localhost:3000';
+    const baseUrl = window.location.origin;
     const formDocente = document.getElementById('form-docente');
     const btnDoc = formDocente.querySelector('.btn-submit');
 
     function setLoading(btn, loading) {
-      if (loading) {
-        btn.disabled = true;
-        btn.textContent = 'Enviando...';
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-      }
+      btn.disabled = loading;
+      btn.textContent = loading ? 'Enviando...' : 'Cadastrar';
     }
 
     formDocente.addEventListener('submit', async function (e) {
