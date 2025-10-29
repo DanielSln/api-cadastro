@@ -42,14 +42,12 @@ app.get("/favicon.ico", (req, res) => {
 const JWT_SECRET = process.env.JWT_SECRET || "pokecreche_secret";
 
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "q1w2e3",
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "pokecreche",
-  port: process.env.MYSQLPORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  timezone: "+00:00",
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
+  ssl: { rejectUnauthorized: false } // Adicione isso
 });
 
 // Função para criar tabelas se não existirem
