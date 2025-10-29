@@ -18,6 +18,14 @@ app.use(cors({ origin: "*" }));
 app.use(cors());
 app.use(express.json());
 
+app.post("/register/aluno", (req, res) => {
+  const { nome, cpf, matricula } = req.body;
+  if (!nome || !cpf || !matricula) {
+    return res.status(400).json({ message: "Dados incompletos" });
+  }
+  // Aqui você faria a lógica de salvar no banco
+  return res.status(201).json({ message: "Aluno cadastrado com sucesso" });
+});
 
 // ✅ Servir arquivos estáticos (CSS, imagens, etc.)
 app.use("/assets", express.static(path.join(__dirname, "assets")));
@@ -42,12 +50,14 @@ app.get("/favicon.ico", (req, res) => {
 const JWT_SECRET = process.env.JWT_SECRET || "pokecreche_secret";
 
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT,
-  ssl: { rejectUnauthorized: false } // Adicione isso
+  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "q1w2e3",
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "pokecreche",
+  port: process.env.MYSQLPORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  timezone: "+00:00",
 });
 
 // Função para criar tabelas se não existirem
