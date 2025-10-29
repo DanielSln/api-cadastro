@@ -10,9 +10,13 @@ const path = require("path");
 
 const app = express();
 
-// Middlewares
-app.use(express.json());
-app.use(cors({ origin: "*" }));
+//Middleware
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Permite todas as origens (para testes)
 app.use(cors());
