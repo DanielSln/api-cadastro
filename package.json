@@ -18,8 +18,5 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.0",
     "serverless-http": "^4.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
   }
 }
