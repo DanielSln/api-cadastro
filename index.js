@@ -20,9 +20,14 @@ app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "alunos.html"));
 });
-app.get("/docentes.html", (req, res) => {
+
+app.get("/docentes", (req, res) => {
   res.sendFile(path.join(__dirname, "docentes.html"));
 });
+app.get("/alunos", (req, res) => {
+  res.sendFile(path.join(__dirname, "alunos.html"));
+});
+
 app.get("/favicon.ico", (req, res) => {
   res.sendFile(path.join(__dirname, "assets", "img", "favicon.ico"));
 });
