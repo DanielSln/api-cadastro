@@ -18,14 +18,6 @@ app.use(cors({ origin: "*" }));
 app.use(cors());
 app.use(express.json());
 
-app.post("/register/aluno", (req, res) => {
-  const { nome, cpf, matricula } = req.body;
-  if (!nome || !cpf || !matricula) {
-    return res.status(400).json({ message: "Dados incompletos" });
-  }
-  // Aqui você faria a lógica de salvar no banco
-  res.json({ message: "Aluno cadastrado com sucesso" });
-});
 
 // ✅ Servir arquivos estáticos (CSS, imagens, etc.)
 app.use("/assets", express.static(path.join(__dirname, "assets")));
