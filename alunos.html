@@ -48,7 +48,8 @@
     </main>
 
     <script>
-      const baseUrl = window.location.origin + "/api/index";
+      const baseUrl = window.location.origin;
+      ``;
       const formAluno = document.getElementById("form-aluno");
       const btnAluno = formAluno.querySelector(".btn-submit");
 
@@ -63,7 +64,7 @@
       }
 
       formAluno.addEventListener("submit", async function (e) {
-  console.log("Enviando para:", baseUrl + "/register/aluno");
+        console.log("Enviando para:", baseUrl + "/register/aluno");
         e.preventDefault();
         const form = e.target;
         const data = {
@@ -80,10 +81,10 @@
             body: JSON.stringify(data),
           });
           if (res.status === 204) {
-  alert("Aluno cadastrado, mas sem resposta do servidor.");
-  return;
-}
-const json = await res.json();
+            alert("Aluno cadastrado, mas sem resposta do servidor.");
+            return;
+          }
+          const json = await res.json();
           if (!res.ok) throw json;
           alert(json.message || "Aluno cadastrado com sucesso");
           form.reset();
