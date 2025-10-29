@@ -23,7 +23,7 @@
             <button
               type="button"
               class="botao-Professor"
-              onclick="location.href='docentes.html'"
+              onclick="location.href='/docentes'"
             >
               Docente
             </button>
@@ -49,7 +49,6 @@
 
     <script>
       const baseUrl = window.location.origin;
-      ``;
       const formAluno = document.getElementById("form-aluno");
       const btnAluno = formAluno.querySelector(".btn-submit");
 
@@ -64,7 +63,6 @@
       }
 
       formAluno.addEventListener("submit", async function (e) {
-        console.log("Enviando para:", baseUrl + "/register/aluno");
         e.preventDefault();
         const form = e.target;
         const data = {
