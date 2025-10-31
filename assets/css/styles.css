@@ -195,3 +195,22 @@ h1{
   }
 }
 
+/* ===== FUNDO PADRÃO (mobile) ===== */
+.background-content {
+  position: absolute;
+  inset: 0; /* cobre toda a tela */
+  background-image: url('/assets/img/background.png'); /* imagem mobile */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== FUNDO DESKTOP ===== */
+@media (min-width: 1024px) {
+  .background-content {
+    background-image: url('/assets/img/bg-desktop.png'); /* imagem desktop */
+  }
+}
