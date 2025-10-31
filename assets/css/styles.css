@@ -40,17 +40,21 @@ body, html {
 /* ===== CONTAINER ===== */
 .background-content {
   height: calc(100% - 56px);
-  background-color: #f6d0a7;
+  background-image: url('/assets/img/background.png'); /* 🌤️ nova imagem de fundo */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #container {
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #f8dcb3 0%, #f6d0a7 100%);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
+  background: rgba(255, 255, 255, 0.25); /* leve camada translúcida p/ contraste */
+  backdrop-filter: blur(2px);
 }
 
 /* ===== BALÃO PRINCIPAL ===== */
@@ -67,13 +71,6 @@ body, html {
 .balao-principal:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.balao-principal h1 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #3c2500;
-  margin-bottom: 24px;
 }
 
 /* ===== BOTÕES DE TOPO ===== */
@@ -171,9 +168,5 @@ body, html {
 
   .ion-toolbar {
     font-size: 20px;
-  }
-
-  .balao-principal h1 {
-    font-size: 24px;
   }
 }
