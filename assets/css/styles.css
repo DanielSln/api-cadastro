@@ -76,6 +76,11 @@ html, body, ion-app, ion-content, ion-page {
   backdrop-filter: blur(2px);
 }
 
+h1{
+  font-size: 29px;
+  margin-bottom: 20px;
+}
+
 /* ===== BALÃO PRINCIPAL ===== */
 .balao-principal {
   background: #fff9f3;
