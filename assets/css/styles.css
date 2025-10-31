@@ -7,21 +7,31 @@
   padding: 0;
 }
 
-html, body {
-  height: 100dvh; /* Altura exata da viewport visível */
+/* ===== AJUSTES GERAIS ===== */
+html, body, ion-app, ion-content, ion-page {
+  height: 100dvh !important;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: none !important;
+  overflow: hidden;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
-  background-color: #f7e1c6;
   color: #3c2500;
-  overflow: hidden; /* impede barras indesejadas */
+  position: relative;
 }
 
 /* ===== HEADER ===== */
 .ion-header {
+  position: absolute; /* flutua sobre o fundo */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   background: transparent;
 }
 
 .ion-toolbar {
-  --background: #c4680b;
+  --background: transparent;
   background: linear-gradient(90deg, #c4680b, #b45e0a);
   color: white;
   display: flex;
@@ -31,6 +41,10 @@ html, body {
   font-weight: 700;
   padding: 10px 16px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  width: auto;
+  margin: 0 auto;
 }
 
 .ion-title {
@@ -40,7 +54,8 @@ html, body {
 
 /* ===== CONTAINER ===== */
 .background-content {
-  height: calc(100dvh - 56px); /* ocupa toda a área abaixo do header */
+  position: absolute;
+  inset: 0; /* cobre toda a tela */
   background-image: url('/assets/img/background.png');
   background-size: cover;
   background-position: center;
@@ -48,11 +63,6 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-h1 {
-  font-size: 28px;
-  margin-bottom: 10px;
 }
 
 #container {
