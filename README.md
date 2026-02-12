@@ -21,4 +21,4 @@ O objetivo da projeto é fornecer uma base simples e funcional para integração
 - Node.js
 - JavaScript
 - Express
-- HTML/CSS (interfaces simples de teste
+- HTML/CSS (interfaces simples de teste)
