@@ -2,11 +2,24 @@
 
 API backend do projeto **CrecheApp**, responsável pelo cadastro e gerenciamento de dados relacionados à creche, como alunos e docentes.
 
-O objetivo da projeto é fornecer uma base simples e funcional para integração com o sistema principal, permitindo registrar e consultar informações utilizadas no app.
+> ⚠️ Projeto desenvolvido como parte dos meus estudos em backend e arquitetura de APIs REST.
 
 ---
 
-## 📌 Funcionalidades
+# 📌 Sobre
+
+Esta API foi criada para servir como base backend do sistema CrecheApp, permitindo a integração com o frontend através de endpoints REST.
+
+O foco principal do projeto é aprendizado prático, explorando:
+
+- criação de APIs com Node.js
+- organização de rotas
+- estruturação de backend
+- integração com banco de dados
+
+---
+
+# 🚀 Funcionalidades
 
 - Cadastro de alunos
 - Cadastro de docentes
@@ -16,9 +29,19 @@ O objetivo da projeto é fornecer uma base simples e funcional para integração
 
 ---
 
-## 🛠 Tecnologias utilizadas
+# 🛠 Tecnologias utilizadas
 
 - Node.js
-- JavaScript
 - Express
+- JavaScript
 - HTML/CSS (interfaces simples de teste)
+
+---
+
+# ▶️ Como rodar o projeto
+
+```bash
+git clone https://github.com/DanielSln/api-cadastro.git
+cd api-cadastro
+npm install
+npm run dev
